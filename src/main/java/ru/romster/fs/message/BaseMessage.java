@@ -5,20 +5,20 @@ package ru.romster.fs.message;
  */
 public class BaseMessage {
 
-    private MessageType type;
+    private String type;
 
     public BaseMessage() {
     }
 
-    public BaseMessage(MessageType type) {
+    public BaseMessage(String type) {
         this.type = type;
     }
 
-    public MessageType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(MessageType type) {
+    public void setType(String type) {
         this.type = type;
     }
 

@@ -1,9 +1,8 @@
 package ru.romster.fs.files;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-import ru.romster.fs.SFile;
+import ru.romster.fs.common.SFile;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;

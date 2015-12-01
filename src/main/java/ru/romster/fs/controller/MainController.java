@@ -6,8 +6,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.romster.fs.common.FSRoom;
+import ru.romster.fs.FileSharerState;
 import ru.romster.fs.files.FileManager;
-import ru.romster.fs.url.RandomUrlGenerator;
+import ru.romster.fs.url.ReadableIdGenerator;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -23,20 +25,23 @@ public class MainController {
     @Autowired
     FileManager fileManager;
     @Autowired
-    RandomUrlGenerator urlGenerator;
+    FileSharerState fileSharerState;
 
     @RequestMapping("/start")
     public String loadStartPage(@RequestParam(value = "id", required = false) String id,
-                           Model model, HttpSession session) throws IOException {
-        if (id == null || !urlGenerator.urlExists(id)) {
-            return "redirect:/start?id=" + urlGenerator.creteNewUrl();
+                                Model model, HttpSession session) throws IOException {
+        if (id == null || !fileSharerState.isSessionExist(FSRoom.START, id)) {
+            return "redirect:/start?id=" + fileSharerState.createNewSession(FSRoom.START);
         }
         return "start";
     }
 
     @RequestMapping("share")
-    public String loadSharePage(@RequestParam(value = "id", required = true) String id,
-                                Model model) throws IOException{
+    public String loadSharePage(@RequestParam(value = "id", required = false) String id,
+                                Model model) throws IOException {
+        if (id == null || !fileSharerState.isSessionExist(FSRoom.SHARE, id)) {
+            return "redirect:/start";
+        }
         model.addAttribute("id", id);
         model.addAttribute("sharedFiles", fileManager.getSharedFiles(id));
         return "share";

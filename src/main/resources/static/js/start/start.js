@@ -1,10 +1,7 @@
 var stompClient = null;
 
 function setConnected(connected) {
-    document.getElementById('connect').disabled = connected;
-    document.getElementById('disconnect').disabled = !connected;
-    document.getElementById('conversationDiv').style.visibility = connected ? 'visible' : 'hidden';
-    document.getElementById('response').innerHTML = '';
+
 }
 
 function connect() {
@@ -13,11 +10,21 @@ function connect() {
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/' + getURLParameter("id"), function (greeting) {
-            alert("OLA!");
-            showGreeting(JSON.parse(greeting.body).content);
+        var topic = '/start/' + getURLParameter("id");
+        stompClient.subscribe(topic, function (message) {
+            var resp = JSON.parse(message.body);
+            var userCount = resp.userCount;
+            var redirectUrl = resp.redirectUrl;
+            if (redirectUrl != null) {
+                window.window.location.replace(redirectUrl);
+            } else {
+                var counter = $('#userCounter');
+                counter.empty();
+                counter.append(userCount);
+            }
         });
     });
+
 }
 
 function disconnect() {
@@ -28,7 +35,12 @@ function disconnect() {
 
 function sendName() {
     var name = document.getElementById('name').value;
-    stompClient.send("/app/start/"+getURLParameter("id"), {}, JSON.stringify({'type': 'BEGIN'}));
+    stompClient.send("/app/start/" + getURLParameter("id"), {}, JSON.stringify({'type': 'BEGIN'}));
+}
+
+
+function sendStart() {
+    stompClient.send("/app/start/" + getURLParameter("id"), {}, JSON.stringify({'type': 'START'}));
 }
 
 function sendNewUser() {
@@ -36,7 +48,7 @@ function sendNewUser() {
 }
 
 function showGreeting(message) {
-    stompClient.send("/app/start/"+getURLParameter("id"), {}, JSON.stringify({'type': 'NEW_USER'}));
+    stompClient.send("/app/start/" + getURLParameter("id"), {}, JSON.stringify({'type': 'NEW_USER'}));
 }
 
 
